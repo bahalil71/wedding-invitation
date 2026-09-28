@@ -228,7 +228,7 @@
       background-size: 16px 16px;
       border: 1px solid #ebdcc8;
       box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
-      padding: 22px 18px;
+      padding: 20px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -236,25 +236,18 @@
       box-sizing: border-box;
       overflow: hidden;
       user-select: none;
-      flex-grow: 1;
     }
 
     /* Wrapper isi halaman agar bisa scroll jika perlu */
     .page-content {
       width: 100%;
-      flex: 1;
+      flex: 1 0 auto;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-    }
-
-    /* Footer halaman (nomor lembar) */
-    .page-footer {
-      text-align: center;
-      margin-top: 8px;
-      z-index: 5;
+      padding-bottom: 8px;
     }
 
     /* Cover keras depan & belakang */
@@ -448,12 +441,17 @@
               </div>
             </div>
 
-            <!-- Jarak Tengah: Dekorasi Cinta -->
+            <!-- Jarak Tengah: Dekorasi Cinta Elegant -->
             <div class="flex items-center justify-center my-1 w-full">
               <div class="h-px bg-rose-200 flex-1"></div>
               <span class="mx-3 text-rose-500 text-lg animate-pulse">💖</span>
               <div class="h-px bg-rose-200 flex-1"></div>
             </div>
+
+            <!-- Tulisan "With Love" Elegant di Bawah -->
+            <p class="font-script text-3xl text-rose-700 text-center my-2 drop-shadow-sm animate-pulse">
+              With Love
+            </p>
 
             <!-- Bride -->
             <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left w-full">
@@ -674,11 +672,33 @@
       });
 
       document.getElementById('prevBtn').addEventListener('click', () => {
-        pageFlipInstance.flipPrev();
+        if (pageFlipInstance) pageFlipInstance.flipPrev();
       });
       document.getElementById('nextBtn').addEventListener('click', () => {
-        pageFlipInstance.flipNext();
+        if (pageFlipInstance) pageFlipInstance.flipNext();
       });
+
+      // Gesture Swipe Support (HP Tanpa Sentuhan Tombol)
+      const touchZone = document.querySelector('.book-wrapper-container');
+      let startX, startY, endX, endY;
+      touchZone.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      touchZone.addEventListener('touchend', e => {
+        endX = e.changedTouches[0].clientX;
+        endY = e.changedTouches[0].clientY;
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+          if (diffX > 0) {
+            if (pageFlipInstance) pageFlipInstance.flipNext();
+          } else {
+            if (pageFlipInstance) pageFlipInstance.flipPrev();
+          }
+        }
+      }, { passive: true });
     }
 
     // Fungsi Buka Amplop

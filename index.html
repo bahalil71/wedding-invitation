@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Buku Undangan: Fulan & Fulanah</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- StPageFlip JS Library Asli (Real 3D Paper Curl & Physics) -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    .font-script { font-family: 'Great Vibes', cursive; }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at center, #231612 0%, #0d0705 100%);
+      color: #3e2e28;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ========================================================
+       ELEGANT ENVELOPE OVERLAY & UNSEALING ANIMATION
+       ======================================================== */
+    #envelope-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #fbf7f0 0%, #ecdcc8 100%);
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+    }
+
+    #envelope-overlay.opened-fade {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .envelope-box {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      cursor: pointer;
+      perspective: 1200px;
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+    @media (min-width: 480px) {
+      .envelope-box { width: 360px; height: 240px; }
+    }
+    .envelope-box:hover { transform: translateY(-4px) scale(1.02); }
+
+    .env-back {
+      position: absolute;
+      inset: 0;
+      background: #cbb292;
+      border-radius: 8px;
+      box-shadow: 0 25px 50px -12px rgba(110, 75, 35, 0.4);
+    }
+
+    .env-letter-card {
+      position: absolute;
+      left: 15px;
+      right: 15px;
+      bottom: 10px;
+      height: 190px;
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid #e7d8c5;
+      padding: 20px 15px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      z-index: 2;
+      transition: transform 1.1s cubic-bezier(0.34, 1.3, 0.64, 1), opacity 0.8s ease;
+      background-image: radial-gradient(#d4af37 0.5px, transparent 0.5px);
+      background-size: 14px 14px;
+    }
+    .env-letter-card.slide-up {
+      transform: translateY(-135px) scale(1.06);
+      box-shadow: 0 30px 60px -10px rgba(90, 50, 20, 0.35);
+      z-index: 10;
+    }
+
+    .env-side-left {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 120px 0 0 180px;
+      border-color: transparent transparent transparent #dfc7a7;
+      border-bottom-left-radius: 8px;
+      z-index: 3;
+    }
+    @media (min-width: 480px) {
+      .env-side-left { border-width: 130px 0 0 200px; }
+    }
+
+    .env-side-right {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 0 120px 180px;
+      border-color: transparent transparent #d6be9c transparent;
+      border-bottom-right-radius: 8px;
+      z-index: 3;
+    }
+    @media (min-width: 480px) {
+      .env-side-right { border-width: 0 0 130px 200px; }
+    }
+
+    .env-bottom-fold {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 160px 115px 160px;
+      border-color: transparent transparent #ecd5b6 transparent;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      z-index: 4;
+    }
+    @media (min-width: 480px) {
+      .env-bottom-fold { border-width: 0 180px 125px 180px; }
+    }
+
+    .env-top-flap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 125px 160px 0 160px;
+      border-color: #e5cbab transparent transparent transparent;
+      transform-origin: top center;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s;
+      z-index: 5;
+    }
+    @media (min-width: 480px) {
+      .env-top-flap { border-width: 135px 180px 0 180px; }
+    }
+    .env-top-flap.open-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    .wax-seal {
+      position: absolute;
+      top: 95px; left: 50%;
+      transform: translateX(-50%);
+      width: 58px; height: 58px;
+      background: radial-gradient(circle at 35% 35%, #e11d48, #9f1239, #6b0726);
+      border-radius: 50%;
+      box-shadow: 0 4px 14px rgba(159, 18, 57, 0.45), inset 0 2px 4px rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 24px;
+      z-index: 6;
+      transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+      cursor: pointer;
+    }
+    .wax-seal::after {
+      content: ''; position: absolute; inset: 4px;
+      border: 1.5px dashed rgba(255, 230, 230, 0.6);
+      border-radius: 50%;
+    }
+    .wax-seal.break-seal {
+      transform: translateX(-50%) scale(1.4) rotate(15deg);
+      opacity: 0; pointer-events: none;
+    }
+
+    /* ========================================================
+       PAGE-FLIP CONTAINER DENGAN REALISTIC 3D PHYSICS
+       ======================================================== */
+    .book-wrapper-container {
+      position: relative;
+      width: 100vw;
+      max-width: 430px;
+      height: 84vh;
+      max-height: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    #flipbook {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.7), 0 0 0 8px #352119, 0 0 0 10px #c59b27;
+      overflow: hidden;
+      background: #faf6f0;
+    }
+
+    /* Tiap Halaman Buku (StPageFlip items) */
+    .page-sheet {
+      width: 100%;
+      height: 100%;
+      background: #fffdfa;
+      background-image: radial-gradient(#e5d8c3 0.6px, transparent 0.6px);
+      background-size: 16px 16px;
+      border: 1px solid #ebdcc8;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      box-sizing: border-box;
+      overflow-y: auto;
+      user-select: none;
+    }
+
+    /* Cover keras depan & belakang */
+    .page-sheet.--hard {
+      background: linear-gradient(135deg, #fffdf8 0%, #f7ecd7 100%);
+      border: 2px solid #c59b27;
+    }
+
+    /* Ornamen Emas Sudut */
+    .gold-corner-tl {
+      position: absolute; top: 6px; left: 6px; width: 24px; height: 24px;
+      border-top: 2px solid #c59b27; border-left: 2px solid #c59b27; pointer-events: none;
+    }
+    .gold-corner-tr {
+      position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
+      border-top: 2px solid #c59b27; border-right: 2px solid #c59b27; pointer-events: none;
+    }
+    .gold-corner-bl {
+      position: absolute; bottom: 6px; left: 6px; width: 24px; height: 24px;
+      border-bottom: 2px solid #c59b27; border-left: 2px solid #c59b27; pointer-events: none;
+    }
+    .gold-corner-br {
+      position: absolute; bottom: 6px; right: 6px; width: 24px; height: 24px;
+      border-bottom: 2px solid #c59b27; border-right: 2px solid #c59b27; pointer-events: none;
+    }
+
+    /* Bar Navigasi Bawah */
+    .book-control-bar {
+      width: 100%;
+      max-width: 430px;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      z-index: 50;
+      user-select: none;
+    }
+
+    .btn-nav {
+      background: #881337;
+      color: #fff;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(136, 19, 55, 0.4);
+      cursor: pointer;
+    }
+    .btn-nav:active { transform: scale(0.95); }
+    .btn-nav:disabled {
+      background: #5a4239;
+      color: #a38c82;
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    /* Falling Petals */
+    .falling-container {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      overflow: hidden; pointer-events: none; z-index: 9999;
+    }
+    .petal-item {
+      position: absolute; top: -50px; user-select: none; pointer-events: none; animation: fallDown linear infinite;
+    }
+    @keyframes fallDown {
+      0% { top: -50px; transform: translateX(0) rotate(0deg); opacity: 0.95; }
+      50% { transform: translateX(70px) rotate(180deg); opacity: 1; }
+      100% { top: 105vh; transform: translateX(-40px) rotate(360deg); opacity: 0.15; }
+    }
+
+    @keyframes spinDisc { 100% { transform: rotate(360deg); } }
+    .spinning-disc { animation: spinDisc 4s linear infinite; }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================
+       ELEGANT ENVELOPE OVERLAY (SCREEN PERTAMA)
+       ======================================================== -->
+  <div id="envelope-overlay">
+    <div class="falling-container" id="envelopePetals"></div>
+
+    <div class="text-center px-4 max-w-md w-full relative z-10 flex flex-col items-center">
+      <p class="font-cinzel text-xs tracking-[0.3em] uppercase text-stone-500 mb-2 font-semibold">
+        The Wedding Invitation
+      </p>
+      <h2 class="font-script text-5xl text-rose-800 mb-6 drop-shadow-sm">
+        Fulan & Fulanah
+      </h2>
+
+      <!-- Amplop Interaktif -->
+      <div class="envelope-box" id="envelopeBox" onclick="openEnvelope()" title="Klik untuk membuka amplop">
+        <div class="env-back"></div>
+        <div class="env-letter-card" id="envLetterCard">
+          <p class="text-[10px] tracking-widest text-stone-400 uppercase font-cinzel">Walimatul 'Ursy</p>
+          <h3 class="font-script text-3xl text-rose-700 my-1">Fulan & Fulanah</h3>
+          <p class="text-xs text-stone-500 font-medium">Minggu, 18 Oktober 2026</p>
+          <div class="w-12 h-0.5 bg-rose-300 mx-auto my-2"></div>
+          <p class="text-[10px] text-stone-600 italic">"Sentuh Sudut Kertas untuk Membalik"</p>
+        </div>
+        <div class="env-top-flap" id="envTopFlap"></div>
+        <div class="wax-seal" id="waxSeal">
+          <i class="fa-solid fa-heart text-lg text-rose-100"></i>
+        </div>
+        <div class="env-side-left"></div>
+        <div class="env-side-right"></div>
+        <div class="env-bottom-fold"></div>
+      </div>
+
+      <div class="mt-8 bg-white/80 border border-stone-300/80 px-6 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+        <p class="text-[11px] text-stone-500">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+        <p id="guestCoverName" class="text-base font-bold text-stone-800 capitalize mt-0.5">Tamu Undangan</p>
+      </div>
+
+      <div class="mt-5">
+        <button onclick="openEnvelope()" class="inline-flex items-center gap-2 px-6 py-2.5 bg-rose-700 hover:bg-rose-800 text-white rounded-full text-xs font-semibold shadow-md transition duration-300">
+          <i class="fa-regular fa-envelope-open text-sm"></i> Buka Amplop & Baca Buku
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hujan Kelopak Bunga -->
+  <div class="falling-container" id="fallingContainer"></div>
+
+  <!-- Audio Player Floating -->
+  <div class="fixed top-4 right-4 z-50">
+    <button id="audioBtn" onclick="toggleAudio()" class="w-11 h-11 rounded-full bg-rose-700 text-white flex items-center justify-center shadow-2xl hover:scale-105 transition ring-2 ring-rose-200">
+      <i id="audioIcon" class="fa-solid fa-compact-disc spinning-disc text-xl"></i>
+    </button>
+    <audio id="bgMusic" loop>
+      <source src="https://actions.google.com/sounds/v1/water/rain_heavy.ogg" type="audio/ogg">
+    </audio>
+  </div>
+
+  <!-- ========================================================
+       WADAH BUKU UNDANGAN (ST-PAGE-FLIP ENGINE)
+       ======================================================== -->
+  <div class="book-wrapper-container">
+    <div id="flipbook">
+
+      <!-- ================= LEMBAR 1: COVER DEPAN ================= -->
+      <div class="page-sheet --hard relative">
+        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+        <div class="my-auto space-y-4">
+          <div class="w-20 h-20 mx-auto rounded-full bg-rose-50 border-2 border-rose-300 flex items-center justify-center shadow-inner">
+            <i class="fa-solid fa-ring text-3xl text-rose-700"></i>
+          </div>
+          <p class="font-cinzel text-xs tracking-[0.25em] uppercase text-stone-500 font-bold">The Wedding of</p>
+          <h1 class="text-5xl font-script text-rose-800 drop-shadow-sm py-1">Fulan & Fulanah</h1>
+          <div class="w-16 h-0.5 bg-rose-400 mx-auto my-2"></div>
+          <p class="text-xs text-stone-600 italic px-4 leading-relaxed">
+            "Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri..."
+          </p>
+          <div class="pt-4 border-t border-stone-200">
+            <p class="text-[11px] text-stone-500">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+            <h3 id="guestName" class="text-lg font-bold text-stone-900 capitalize mt-0.5">Tamu Undangan</h3>
+          </div>
+        </div>
+        <div class="text-[10px] text-amber-700/80 font-bold animate-pulse">
+          👆 Geser ujung kertas atau klik tombol di bawah ➔
+        </div>
+      </div>
+
+      <!-- ================= LEMBAR 2: MEMPELAI ================= -->
+      <div class="page-sheet relative">
+        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+        <div class="my-auto w-full space-y-4">
+          <h2 class="text-3xl font-script text-rose-800">Kedua Mempelai</h2>
+          <p class="text-[11px] text-stone-500">Dengan memohon rahmat & ridho Allah SWT:</p>
+
+          <!-- Groom -->
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" class="w-16 h-16 rounded-full object-cover border-2 border-rose-300 shadow">
+            <div>
+              <h3 class="text-sm font-bold text-stone-800">Fulan Pratama, S.T</h3>
+              <p class="text-[10px] text-stone-500">Putra dari Bpk. Fulan & Ibu Fulanah</p>
+              <a href="https://instagram.com" target="_blank" class="text-[10px] text-rose-600 font-semibold hover:underline">
+                <i class="fa-brands fa-instagram"></i> @fulan_id
+              </a>
+            </div>
+          </div>
+
+          <!-- Bride -->
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" class="w-16 h-16 rounded-full object-cover border-2 border-rose-300 shadow">
+            <div>
+              <h3 class="text-sm font-bold text-stone-800">Fulanah Anugerah, S.E</h3>
+              <p class="text-[10px] text-stone-500">Putri dari Bpk. Ahmad & Ibu Siti</p>
+              <a href="https://instagram.com" target="_blank" class="text-[10px] text-rose-600 font-semibold hover:underline">
+                <i class="fa-brands fa-instagram"></i> @fulanah_id
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="text-[9px] text-stone-400">Lembar 2</div>
+      </div>
+
+      <!-- ================= LEMBAR 3: TANGGAL & ACARA ================= -->
+      <div class="page-sheet relative">
+        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+        <div class="my-auto w-full space-y-3">
+          <h2 class="text-3xl font-script text-rose-800">Waktu & Tempat</h2>
+          
+          <!-- Countdown -->
+          <div class="grid grid-cols-4 gap-1.5 max-w-xs mx-auto py-1">
+            <div class="bg-white p-1.5 rounded-xl border border-rose-200 shadow-sm">
+              <span id="days" class="text-base font-bold text-rose-700 block">00</span>
+              <span class="text-[9px] text-stone-500">Hari</span>
+            </div>
+            <div class="bg-white p-1.5 rounded-xl border border-rose-200 shadow-sm">
+              <span id="hours" class="text-base font-bold text-rose-700 block">00</span>
+              <span class="text-[9px] text-stone-500">Jam</span>
+            </div>
+            <div class="bg-white p-1.5 rounded-xl border border-rose-200 shadow-sm">
+              <span id="minutes" class="text-base font-bold text-rose-700 block">00</span>
+              <span class="text-[9px] text-stone-500">Menit</span>
+            </div>
+            <div class="bg-white p-1.5 rounded-xl border border-rose-200 shadow-sm">
+              <span id="seconds" class="text-base font-bold text-rose-700 block">00</span>
+              <span class="text-[9px] text-stone-500">Detik</span>
+            </div>
+          </div>
+
+          <!-- Akad -->
+          <div class="bg-white/90 p-3 rounded-2xl border border-stone-200 shadow-sm text-left">
+            <p class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-ring text-rose-600"></i> Akad Nikah
+            </p>
+            <p class="text-[11px] text-stone-700 font-semibold mt-0.5">Minggu, 18 Oktober 2026</p>
+            <p class="text-[10px] text-stone-500">08.00 - 10.00 WIB</p>
+            <p class="text-[10px] text-stone-600 mt-1"><strong>Gedung Serbaguna Bahagia</strong>, Jakarta</p>
+          </div>
+
+          <!-- Resepsi -->
+          <div class="bg-white/90 p-3 rounded-2xl border border-stone-200 shadow-sm text-left">
+            <p class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-champagne-glasses text-rose-600"></i> Resepsi Pernikahan
+            </p>
+            <p class="text-[11px] text-stone-700 font-semibold mt-0.5">Minggu, 18 Oktober 2026</p>
+            <p class="text-[10px] text-stone-500">11.00 - 16.00 WIB</p>
+            <p class="text-[10px] text-stone-600 mt-1"><strong>Hotel Grand Cempaka</strong>, Jakarta Pusat</p>
+          </div>
+
+          <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-1 px-4 py-1.5 bg-rose-50 text-rose-700 border border-rose-300 rounded-full text-[11px] font-semibold hover:bg-rose-600 hover:text-white transition">
+            <i class="fa-solid fa-location-dot"></i> Buka Google Maps
+          </a>
+        </div>
+        <div class="text-[9px] text-stone-400">Lembar 3</div>
+      </div>
+
+      <!-- ================= LEMBAR 4: GALERI FOTO ================= -->
+      <div class="page-sheet relative">
+        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+        <div class="my-auto w-full space-y-3">
+          <h2 class="text-3xl font-script text-rose-800">Galeri Foto</h2>
+          <p class="text-[11px] text-stone-500">Momen indah yang kami abadikan</p>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div class="overflow-hidden rounded-xl border border-stone-200 shadow-sm">
+              <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=300" class="h-28 w-full object-cover">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-stone-200 shadow-sm">
+              <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&q=80&w=300" class="h-28 w-full object-cover">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-stone-200 shadow-sm">
+              <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300" class="h-28 w-full object-cover">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-stone-200 shadow-sm">
+              <img src="https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=300" class="h-28 w-full object-cover">
+            </div>
+          </div>
+
+          <p class="text-[10px] text-stone-400 italic">"Cinta sejati adalah saling menguatkan dalam ridho-Nya"</p>
+        </div>
+        <div class="text-[9px] text-stone-400">Lembar 4</div>
+      </div>
+
+      <!-- ================= LEMBAR 5: KADO & RSVP ================= -->
+      <div class="page-sheet relative">
+        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+        <div class="my-auto w-full space-y-3">
+          <h2 class="text-3xl font-script text-rose-800">Kado & Doa Restu</h2>
+
+          <!-- Rekening -->
+          <div class="bg-white/90 p-2.5 rounded-xl border border-stone-200 shadow-sm flex justify-between items-center text-left">
+            <div>
+              <p class="text-[9px] font-bold text-stone-400">BANK BCA</p>
+              <p id="acc1" class="text-xs font-bold text-stone-800">8901234567</p>
+              <p class="text-[9px] text-stone-500">a.n. Fulan Pratama</p>
+            </div>
+            <button onclick="copyToClipboard('acc1')" class="text-[10px] bg-rose-50 text-rose-700 px-2.5 py-1 rounded-lg border border-rose-200 font-semibold">
+              Salin
+            </button>
+          </div>
+
+          <div class="bg-white/90 p-2.5 rounded-xl border border-stone-200 shadow-sm flex justify-between items-center text-left">
+            <div>
+              <p class="text-[9px] font-bold text-stone-400">BANK MANDIRI</p>
+              <p id="acc2" class="text-xs font-bold text-stone-800">1234567890</p>
+              <p class="text-[9px] text-stone-500">a.n. Fulanah Anugerah</p>
+            </div>
+            <button onclick="copyToClipboard('acc2')" class="text-[10px] bg-rose-50 text-rose-700 px-2.5 py-1 rounded-lg border border-rose-200 font-semibold">
+              Salin
+            </button>
+          </div>
+
+          <!-- RSVP Mini -->
+          <form id="rsvpForm" class="bg-white/90 p-2.5 rounded-xl border border-rose-100 text-left space-y-2">
+            <input type="text" id="senderName" required placeholder="Nama Anda" class="w-full text-xs px-2.5 py-1.5 border border-stone-200 rounded-lg">
+            <select id="attendance" class="w-full text-xs px-2.5 py-1.5 border border-stone-200 rounded-lg bg-white">
+              <option value="Hadir">Hadir</option>
+              <option value="Tidak Hadir">Tidak Hadir</option>
+            </select>
+            <textarea id="message" rows="2" placeholder="Tulis doa restu..." class="w-full text-xs px-2.5 py-1.5 border border-stone-200 rounded-lg"></textarea>
+            <button type="submit" class="w-full py-1.5 bg-rose-700 text-white rounded-lg text-xs font-bold hover:bg-rose-800">
+              Kirim Doa Restu
+            </button>
+          </form>
+        </div>
+        <div class="text-[9px] text-stone-400">Lembar 5</div>
+      </div>
+
+      <!-- ================= LEMBAR 6: PENUTUP ================= -->
+      <div class="page-sheet --hard relative">
+        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+        <div class="my-auto space-y-4">
+          <div class="w-16 h-16 mx-auto rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
+            <i class="fa-solid fa-heart text-2xl text-rose-600"></i>
+          </div>
+          <h2 class="text-4xl font-script text-rose-800">Terima Kasih</h2>
+          <p class="text-xs text-stone-600 px-4 leading-relaxed">
+            Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.
+          </p>
+          <div class="w-12 h-0.5 bg-rose-300 mx-auto my-2"></div>
+          <p class="font-cinzel text-xs text-stone-500 uppercase tracking-widest">Kami yang berbahagia,</p>
+          <p class="font-script text-3xl text-rose-700">Fulan & Fulanah</p>
+          <p class="text-[10px] text-stone-400">Beserta Keluarga Besar</p>
+        </div>
+        <div class="text-[9px] text-stone-400">Sampul Belakang</div>
+      </div>
+
+    </div>
+
+    <!-- BAR NAVIGASI BAWAH BUKU -->
+    <div class="book-control-bar">
+      <button id="prevBtn" class="btn-nav" disabled>
+        <i class="fa-solid fa-chevron-left text-xs"></i> Lembar Lalu
+      </button>
+
+      <span id="pageIndicator" class="text-xs font-cinzel font-bold text-amber-200 tracking-wider">
+        Halaman 1 / 6
+      </span>
+
+      <button id="nextBtn" class="btn-nav">
+        Lembar Berikut <i class="fa-solid fa-chevron-right text-xs"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let pageFlipInstance = null;
+
+    function initPageFlip() {
+      const bookEl = document.getElementById('flipbook');
+      const rect = bookEl.getBoundingClientRect();
+      const w = Math.round(rect.width) || 380;
+      const h = Math.round(rect.height) || 580;
+
+      // Inisialisasi Real 3D StPageFlip
+      pageFlipInstance = new St.PageFlip(bookEl, {
+        width: w,
+        height: h,
+        size: 'stretch',
+        minWidth: 280,
+        maxWidth: 500,
+        minHeight: 450,
+        maxHeight: 750,
+        maxShadowOpacity: 0.6, // Shadow tekukan kertas realistis
+        showCover: true,       // Lembar 1 dan 6 sebagai hard cover
+        mobileScrollSupport: false,
+        usePortrait: true,     // Tampilan 1 lembar portrait cocok untuk HP
+        flippingTime: 900      // Durasi lentur kertas
+      });
+
+      // Muat elemen halaman
+      pageFlipInstance.loadFromHTML(document.querySelectorAll('.page-sheet'));
+
+      // Event saat halaman terbalik
+      pageFlipInstance.on('flip', (e) => {
+        const current = e.data + 1;
+        const total = pageFlipInstance.getPageCount();
+        document.getElementById('pageIndicator').innerText = `Halaman ${current} / ${total}`;
+        document.getElementById('prevBtn').disabled = (current <= 1);
+        document.getElementById('nextBtn').disabled = (current >= total);
+      });
+
+      // Tombol Navigasi
+      document.getElementById('prevBtn').addEventListener('click', () => {
+        pageFlipInstance.flipPrev();
+      });
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        pageFlipInstance.flipNext();
+      });
+    }
+
+    // Fungsi Buka Amplop
+    let isEnvelopeOpen = false;
+    function openEnvelope() {
+      if (isEnvelopeOpen) return;
+      isEnvelopeOpen = true;
+
+      const waxSeal = document.getElementById('waxSeal');
+      const envTopFlap = document.getElementById('envTopFlap');
+      const envLetterCard = document.getElementById('envLetterCard');
+      const envelopeOverlay = document.getElementById('envelope-overlay');
+
+      waxSeal.classList.add('break-seal');
+
+      setTimeout(() => {
+        envTopFlap.classList.add('open-flap');
+      }, 250);
+
+      setTimeout(() => {
+        envLetterCard.classList.add('slide-up');
+      }, 650);
+
+      // Play Audio otomatis
+      const audio = document.getElementById('bgMusic');
+      if (audio) {
+        audio.play().then(() => {
+          isPlaying = true;
+          const audioIcon = document.getElementById('audioIcon');
+          if (audioIcon) {
+            audioIcon.className = "fa-solid fa-compact-disc spinning-disc text-xl";
+          }
+        }).catch(err => console.log('Autoplay:', err));
+      }
+
+      // Hilangkan amplop & inisialisasi buku
+      setTimeout(() => {
+        envelopeOverlay.classList.add('opened-fade');
+        // Init flipbook setelah amplop hilang agar ukurannya akurat
+        setTimeout(initPageFlip, 200);
+      }, 1600);
+    }
+
+    // Spawn Kelopak Bunga
+    function spawnPetals(targetId, count) {
+      const container = document.getElementById(targetId);
+      if (!container) return;
+      const flowers = ['🌸', '✨', '💖', '🌺', '🍃'];
+      for (let i = 0; i < count; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal-item';
+        petal.innerText = flowers[Math.floor(Math.random() * flowers.length)];
+        petal.style.left = (Math.random() * 95) + 'vw';
+        petal.style.animationDuration = (Math.random() * 4 + 4) + 's';
+        petal.style.animationDelay = (Math.random() * 5) + 's';
+        petal.style.fontSize = (Math.random() * 10 + 14) + 'px';
+        container.appendChild(petal);
+      }
+    }
+
+    // URL Param ?to=Nama+Tamu
+    const urlParams = new URLSearchParams(window.location.search);
+    const toParam = urlParams.get('to');
+    if (toParam) {
+      const guestName = document.getElementById('guestName');
+      const guestCoverName = document.getElementById('guestCoverName');
+      const senderName = document.getElementById('senderName');
+      if (guestName) guestName.innerText = toParam;
+      if (guestCoverName) guestCoverName.innerText = toParam;
+      if (senderName) senderName.value = toParam;
+    }
+
+    // Audio Play/Pause
+    const audio = document.getElementById('bgMusic');
+    const audioIcon = document.getElementById('audioIcon');
+    let isPlaying = false;
+    function toggleAudio() {
+      if (isPlaying) {
+        audio.pause();
+        audioIcon.className = "fa-solid fa-play text-xl";
+      } else {
+        audio.play().catch(() => {});
+        audioIcon.className = "fa-solid fa-compact-disc spinning-disc text-xl";
+      }
+      isPlaying = !isPlaying;
+    }
+
+    // Countdown Timer Target: 18 Oct 2026
+    const targetDate = new Date("2026-10-18T08:00:00").getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+      if (diff > 0) {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % 1000) / 1000);
+
+        const elD = document.getElementById('days');
+        const elH = document.getElementById('hours');
+        const elM = document.getElementById('minutes');
+        const elS = document.getElementById('seconds');
+        if (elD) elD.innerText = String(d).padStart(2, '0');
+        if (elH) elH.innerText = String(h).padStart(2, '0');
+        if (elM) elM.innerText = String(m).padStart(2, '0');
+        if (elS) elS.innerText = String(s).padStart(2, '0');
+      }
+    }, 1000);
+
+    // Salin Rekening
+    function copyToClipboard(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText);
+      alert('Nomor rekening berhasil disalin: ' + el.innerText);
+    }
+
+    // RSVP Submit
+    const rsvpForm = document.getElementById('rsvpForm');
+    if (rsvpForm) {
+      rsvpForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Terima kasih, ucapan & konfirmasi berhasil dikirimkan!');
+        document.getElementById('message').value = '';
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      spawnPetals('envelopePetals', 16);
+      spawnPetals('fallingContainer', 22);
+    });
+  </script>
+</body>
+</html>

@@ -198,13 +198,14 @@
       position: relative;
       width: 100vw;
       max-width: 430px;
-      height: 84vh;
-      max-height: 680px;
+      height: calc(88vh - 60px);
+      max-height: 660px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 8px;
+      overflow: hidden;
     }
 
     #flipbook {
@@ -216,24 +217,44 @@
       background: #faf6f0;
     }
 
-    /* Tiap Halaman Buku (StPageFlip items) */
+    /* Tiap Halaman Buku - Full tinggi, isi penuh */
     .page-sheet {
       width: 100%;
-      height: 100%;
+      height: 100% !important;
+      min-height: 100% !important;
+      max-height: 100%;
       background: #fffdfa;
       background-image: radial-gradient(#e5d8c3 0.6px, transparent 0.6px);
       background-size: 16px 16px;
       border: 1px solid #ebdcc8;
       box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
-      padding: 24px 20px;
+      padding: 22px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
       text-align: center;
       box-sizing: border-box;
-      overflow-y: auto;
+      overflow: hidden;
       user-select: none;
+      flex-grow: 1;
+    }
+
+    /* Wrapper isi halaman agar bisa scroll jika perlu */
+    .page-content {
+      width: 100%;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Footer halaman (nomor lembar) */
+    .page-footer {
+      text-align: center;
+      margin-top: 8px;
+      z-index: 5;
     }
 
     /* Cover keras depan & belakang */
@@ -368,11 +389,12 @@
 
   <!-- Audio Player Floating -->
   <div class="fixed top-4 right-4 z-50">
-    <button id="audioBtn" onclick="toggleAudio()" class="w-11 h-11 rounded-full bg-rose-700 text-white flex items-center justify-center shadow-2xl hover:scale-105 transition ring-2 ring-rose-200">
+    <button id="audioBtn" onclick="toggleAudio()" title="Putar/Jeda Musik" class="w-11 h-11 rounded-full bg-rose-700 text-white flex items-center justify-center shadow-2xl hover:scale-105 transition ring-2 ring-rose-200">
       <i id="audioIcon" class="fa-solid fa-compact-disc spinning-disc text-xl"></i>
     </button>
-    <audio id="bgMusic" loop>
-      <source src="https://actions.google.com/sounds/v1/water/rain_heavy.ogg" type="audio/ogg">
+    <audio id="bgMusic" loop preload="auto" muted autoplay playsinline>
+      <source src="./wedding-song.mp3" type="audio/mpeg">
+      Musik undangan belum siap.
     </audio>
   </div>
 
@@ -383,10 +405,10 @@
     <div id="flipbook">
 
       <!-- ================= LEMBAR 1: COVER DEPAN ================= -->
-      <div class="page-sheet --hard relative">
+      <div class="page-sheet --hard relative" data-density="hard">
         <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
         <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
-        <div class="my-auto space-y-4">
+        <div class="page-content space-y-4">
           <div class="w-20 h-20 mx-auto rounded-full bg-rose-50 border-2 border-rose-300 flex items-center justify-center shadow-inner">
             <i class="fa-solid fa-ring text-3xl text-rose-700"></i>
           </div>
@@ -401,51 +423,58 @@
             <h3 id="guestName" class="text-lg font-bold text-stone-900 capitalize mt-0.5">Tamu Undangan</h3>
           </div>
         </div>
-        <div class="text-[10px] text-amber-700/80 font-bold animate-pulse">
+        <div class="page-footer text-[9px] text-amber-700/80 font-bold animate-pulse">
           👆 Geser ujung kertas atau klik tombol di bawah ➔
         </div>
       </div>
 
-      <!-- ================= LEMBAR 2: MEMPELAI ================= -->
-      <div class="page-sheet relative">
-        <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
-        <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
-        <div class="my-auto w-full space-y-4">
-          <h2 class="text-3xl font-script text-rose-800">Kedua Mempelai</h2>
-          <p class="text-[11px] text-stone-500">Dengan memohon rahmat & ridho Allah SWT:</p>
+        <!-- ================= LEMBAR 2: MEMPELAI ================= -->
+        <div class="page-sheet relative">
+          <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
+          <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
+          <div class="page-content space-y-4">
+            <h2 class="text-3xl font-script text-rose-800">Kedua Mempelai</h2>
+            <p class="text-[11px] text-stone-500">Dengan memohon rahmat & ridho Allah SWT:</p>
 
-          <!-- Groom -->
-          <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" class="w-16 h-16 rounded-full object-cover border-2 border-rose-300 shadow">
-            <div>
-              <h3 class="text-sm font-bold text-stone-800">Fulan Pratama, S.T</h3>
-              <p class="text-[10px] text-stone-500">Putra dari Bpk. Fulan & Ibu Fulanah</p>
-              <a href="https://instagram.com" target="_blank" class="text-[10px] text-rose-600 font-semibold hover:underline">
-                <i class="fa-brands fa-instagram"></i> @fulan_id
-              </a>
+            <!-- Groom -->
+            <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left w-full">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" class="w-16 h-16 rounded-full object-cover border-2 border-rose-300 shadow">
+              <div>
+                <h3 class="text-sm font-bold text-stone-800">Fulan Pratama, S.T</h3>
+                <p class="text-[10px] text-stone-500">Putra dari Bpk. Fulan & Ibu Fulanah</p>
+                <a href="https://instagram.com" target="_blank" class="text-[10px] text-rose-600 font-semibold hover:underline">
+                  <i class="fa-brands fa-instagram"></i> @fulan_id
+                </a>
+              </div>
+            </div>
+
+            <!-- Jarak Tengah: Dekorasi Cinta -->
+            <div class="flex items-center justify-center my-1 w-full">
+              <div class="h-px bg-rose-200 flex-1"></div>
+              <span class="mx-3 text-rose-500 text-lg animate-pulse">💖</span>
+              <div class="h-px bg-rose-200 flex-1"></div>
+            </div>
+
+            <!-- Bride -->
+            <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left w-full">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" class="w-16 h-16 rounded-full object-cover border-2 border-rose-300 shadow">
+              <div>
+                <h3 class="text-sm font-bold text-stone-800">Fulanah Anugerah, S.E</h3>
+                <p class="text-[10px] text-stone-500">Putri dari Bpk. Ahmad & Ibu Siti</p>
+                <a href="https://instagram.com" target="_blank" class="text-[10px] text-rose-600 font-semibold hover:underline">
+                  <i class="fa-brands fa-instagram"></i> @fulanah_id
+                </a>
+              </div>
             </div>
           </div>
-
-          <!-- Bride -->
-          <div class="bg-white/80 p-3.5 rounded-2xl border border-rose-100 shadow-sm flex items-center gap-3 text-left">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" class="w-16 h-16 rounded-full object-cover border-2 border-rose-300 shadow">
-            <div>
-              <h3 class="text-sm font-bold text-stone-800">Fulanah Anugerah, S.E</h3>
-              <p class="text-[10px] text-stone-500">Putri dari Bpk. Ahmad & Ibu Siti</p>
-              <a href="https://instagram.com" target="_blank" class="text-[10px] text-rose-600 font-semibold hover:underline">
-                <i class="fa-brands fa-instagram"></i> @fulanah_id
-              </a>
-            </div>
-          </div>
+          <div class="page-footer text-[9px] text-stone-400">Lembar 2</div>
         </div>
-        <div class="text-[9px] text-stone-400">Lembar 2</div>
-      </div>
 
       <!-- ================= LEMBAR 3: TANGGAL & ACARA ================= -->
       <div class="page-sheet relative">
         <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
         <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
-        <div class="my-auto w-full space-y-3">
+        <div class="page-content space-y-3">
           <h2 class="text-3xl font-script text-rose-800">Waktu & Tempat</h2>
           
           <!-- Countdown -->
@@ -492,18 +521,19 @@
             <i class="fa-solid fa-location-dot"></i> Buka Google Maps
           </a>
         </div>
-        <div class="text-[9px] text-stone-400">Lembar 3</div>
+        <div class="page-footer text-[9px] text-stone-400">Lembar 3</div>
+      </div>
       </div>
 
       <!-- ================= LEMBAR 4: GALERI FOTO ================= -->
       <div class="page-sheet relative">
         <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
         <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
-        <div class="my-auto w-full space-y-3">
+        <div class="page-content space-y-3">
           <h2 class="text-3xl font-script text-rose-800">Galeri Foto</h2>
           <p class="text-[11px] text-stone-500">Momen indah yang kami abadikan</p>
 
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2 w-full">
             <div class="overflow-hidden rounded-xl border border-stone-200 shadow-sm">
               <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=300" class="h-28 w-full object-cover">
             </div>
@@ -520,18 +550,19 @@
 
           <p class="text-[10px] text-stone-400 italic">"Cinta sejati adalah saling menguatkan dalam ridho-Nya"</p>
         </div>
-        <div class="text-[9px] text-stone-400">Lembar 4</div>
+        <div class="page-footer text-[9px] text-stone-400">Lembar 4</div>
+      </div>
       </div>
 
       <!-- ================= LEMBAR 5: KADO & RSVP ================= -->
       <div class="page-sheet relative">
         <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
         <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
-        <div class="my-auto w-full space-y-3">
+        <div class="page-content space-y-3">
           <h2 class="text-3xl font-script text-rose-800">Kado & Doa Restu</h2>
 
           <!-- Rekening -->
-          <div class="bg-white/90 p-2.5 rounded-xl border border-stone-200 shadow-sm flex justify-between items-center text-left">
+          <div class="bg-white/90 p-2.5 rounded-xl border border-stone-200 shadow-sm flex justify-between items-center text-left w-full">
             <div>
               <p class="text-[9px] font-bold text-stone-400">BANK BCA</p>
               <p id="acc1" class="text-xs font-bold text-stone-800">8901234567</p>
@@ -542,7 +573,7 @@
             </button>
           </div>
 
-          <div class="bg-white/90 p-2.5 rounded-xl border border-stone-200 shadow-sm flex justify-between items-center text-left">
+          <div class="bg-white/90 p-2.5 rounded-xl border border-stone-200 shadow-sm flex justify-between items-center text-left w-full">
             <div>
               <p class="text-[9px] font-bold text-stone-400">BANK MANDIRI</p>
               <p id="acc2" class="text-xs font-bold text-stone-800">1234567890</p>
@@ -554,7 +585,7 @@
           </div>
 
           <!-- RSVP Mini -->
-          <form id="rsvpForm" class="bg-white/90 p-2.5 rounded-xl border border-rose-100 text-left space-y-2">
+          <form id="rsvpForm" class="bg-white/90 p-2.5 rounded-xl border border-rose-100 text-left space-y-2 w-full">
             <input type="text" id="senderName" required placeholder="Nama Anda" class="w-full text-xs px-2.5 py-1.5 border border-stone-200 rounded-lg">
             <select id="attendance" class="w-full text-xs px-2.5 py-1.5 border border-stone-200 rounded-lg bg-white">
               <option value="Hadir">Hadir</option>
@@ -566,14 +597,14 @@
             </button>
           </form>
         </div>
-        <div class="text-[9px] text-stone-400">Lembar 5</div>
+        <div class="page-footer text-[9px] text-stone-400">Lembar 5</div>
       </div>
 
       <!-- ================= LEMBAR 6: PENUTUP ================= -->
-      <div class="page-sheet --hard relative">
+      <div class="page-sheet --hard relative" data-density="hard">
         <div class="gold-corner-tl"></div><div class="gold-corner-tr"></div>
         <div class="gold-corner-bl"></div><div class="gold-corner-br"></div>
-        <div class="my-auto space-y-4">
+        <div class="page-content space-y-4">
           <div class="w-16 h-16 mx-auto rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
             <i class="fa-solid fa-heart text-2xl text-rose-600"></i>
           </div>
@@ -586,7 +617,7 @@
           <p class="font-script text-3xl text-rose-700">Fulan & Fulanah</p>
           <p class="text-[10px] text-stone-400">Beserta Keluarga Besar</p>
         </div>
-        <div class="text-[9px] text-stone-400">Sampul Belakang</div>
+        <div class="page-footer text-[9px] text-stone-400">Sampul Belakang</div>
       </div>
 
     </div>
@@ -616,7 +647,6 @@
       const w = Math.round(rect.width) || 380;
       const h = Math.round(rect.height) || 580;
 
-      // Inisialisasi Real 3D StPageFlip
       pageFlipInstance = new St.PageFlip(bookEl, {
         width: w,
         height: h,
@@ -625,17 +655,16 @@
         maxWidth: 500,
         minHeight: 450,
         maxHeight: 750,
-        maxShadowOpacity: 0.6, // Shadow tekukan kertas realistis
-        showCover: true,       // Lembar 1 dan 6 sebagai hard cover
-        mobileScrollSupport: false,
-        usePortrait: true,     // Tampilan 1 lembar portrait cocok untuk HP
-        flippingTime: 900      // Durasi lentur kertas
+        maxShadowOpacity: 0.5,
+        showCover: true,
+        mobileScrollSupport: true,
+        usePortrait: true,
+        flippingTime: 650,
+        swipeDistance: 10       // Sensitivitas swipe dinaikkan, responsif di HP
       });
 
-      // Muat elemen halaman
       pageFlipInstance.loadFromHTML(document.querySelectorAll('.page-sheet'));
 
-      // Event saat halaman terbalik
       pageFlipInstance.on('flip', (e) => {
         const current = e.data + 1;
         const total = pageFlipInstance.getPageCount();
@@ -644,7 +673,6 @@
         document.getElementById('nextBtn').disabled = (current >= total);
       });
 
-      // Tombol Navigasi
       document.getElementById('prevBtn').addEventListener('click', () => {
         pageFlipInstance.flipPrev();
       });
@@ -674,24 +702,90 @@
         envLetterCard.classList.add('slide-up');
       }, 650);
 
-      // Play Audio otomatis
+      // Play Audio otomatis (setelah interaksi user → lolos autoplay policy)
       const audio = document.getElementById('bgMusic');
+      const audioIcon = document.getElementById('audioIcon');
       if (audio) {
+        audio.muted = false;
         audio.play().then(() => {
           isPlaying = true;
-          const audioIcon = document.getElementById('audioIcon');
-          if (audioIcon) {
-            audioIcon.className = "fa-solid fa-compact-disc spinning-disc text-xl";
-          }
-        }).catch(err => console.log('Autoplay:', err));
+          if (audioIcon) audioIcon.className = "fa-solid fa-compact-disc spinning-disc text-xl";
+        }).catch(err => {
+          console.log('Autoplay attempt failed:', err);
+          // Coba unmute manual jika user belum interaksi
+          audio.muted = false;
+          audio.play().catch(() => {});
+        });
       }
 
       // Hilangkan amplop & inisialisasi buku
       setTimeout(() => {
         envelopeOverlay.classList.add('opened-fade');
-        // Init flipbook setelah amplop hilang agar ukurannya akurat
         setTimeout(initPageFlip, 200);
       }, 1600);
+    }
+
+    // Toggle Musik Manual
+    const audio = document.getElementById('bgMusic');
+    const audioIcon = document.getElementById('audioIcon');
+    let isPlaying = false;
+
+    function toggleAudio() {
+      if (isPlaying) {
+        audio.pause();
+        audioIcon.className = "fa-solid fa-play text-xl";
+      } else {
+        audio.muted = false;
+        audio.play().catch(() => {});
+        audioIcon.className = "fa-solid fa-compact-disc spinning-disc text-xl";
+      }
+      isPlaying = !isPlaying;
+    }
+
+    // Pilih & ganti musik
+    function openMusicPicker() {
+      document.getElementById('musicModal').classList.add('show');
+    }
+    function closeMusicPicker() {
+      document.getElementById('musicModal').classList.remove('show');
+    }
+
+    const PRESET_MUSIC = {
+      1: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
+      2: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3",
+      3: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    };
+
+    function setMusicPreset(num) {
+      const audio = document.getElementById('bgMusic');
+      const sourceEl = document.getElementById('audioSource');
+      sourceEl.src = PRESET_MUSIC[num];
+      audio.load();
+      audio.muted = false;
+      audio.play().then(() => {
+        isPlaying = true;
+        document.getElementById('audioIcon').className = "fa-solid fa-compact-disc spinning-disc text-xl";
+      }).catch(e => console.log("Music play failed:", e));
+      closeMusicPicker();
+      alert("🎵 Musik diganti ke pilihan " + num + " dan akan diputar!");
+    }
+
+    function handleAudioUpload(event) {
+      const file = event.target.files[0];
+      if (file && file.type.includes('audio')) {
+        const fileUrl = URL.createObjectURL(file);
+        const audio = document.getElementById('bgMusic');
+        const sourceEl = document.getElementById('audioSource');
+        sourceEl.src = fileUrl;
+        audio.load();
+        audio.muted = false;
+        audio.play().then(() => {
+          isPlaying = true;
+          document.getElementById('audioIcon').className = "fa-solid fa-compact-disc spinning-disc text-xl";
+        }).catch(e => console.log("Upload play failed:", e));
+        closeMusicPicker();
+        alert("🎵 Lagu Anda berhasil diunggah dan akan diputar!");
+      }
     }
 
     // Spawn Kelopak Bunga
@@ -721,21 +815,6 @@
       if (guestName) guestName.innerText = toParam;
       if (guestCoverName) guestCoverName.innerText = toParam;
       if (senderName) senderName.value = toParam;
-    }
-
-    // Audio Play/Pause
-    const audio = document.getElementById('bgMusic');
-    const audioIcon = document.getElementById('audioIcon');
-    let isPlaying = false;
-    function toggleAudio() {
-      if (isPlaying) {
-        audio.pause();
-        audioIcon.className = "fa-solid fa-play text-xl";
-      } else {
-        audio.play().catch(() => {});
-        audioIcon.className = "fa-solid fa-compact-disc spinning-disc text-xl";
-      }
-      isPlaying = !isPlaying;
     }
 
     // Countdown Timer Target: 18 Oct 2026
@@ -783,5 +862,54 @@
       spawnPetals('fallingContainer', 22);
     });
   </script>
+  <!-- ========================================================
+       MODAL 1: PILIH / GANTI MUSIK CEPAT
+       ======================================================== -->
+  <div id="musicModal" class="modal-backdrop" onclick="if(event.target === this) closeMusicPicker()">
+    <div class="bg-stone-900 border border-amber-400/40 text-stone-100 max-w-sm w-full rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-stone-800 pb-2">
+        <h3 class="font-cinzel text-sm text-amber-300 font-bold">🎵 Pengaturan Musik</h3>
+        <button onclick="closeMusicPicker()" class="text-stone-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <p class="text-xs text-stone-300">Pilih musik romantis bawaan atau unggah file MP3 sendiri:</p>
+      
+      <!-- Preset Lagu -->
+      <div class="space-y-2 text-xs">
+        <button onclick="setMusicPreset(1)" class="w-full text-left p-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 flex justify-between items-center">
+          <span>💖 1. Romantis & Cinta (Default)</span>
+          <i class="fa-solid fa-play text-[10px] text-amber-300"></i>
+        </button>
+        <button onclick="setMusicPreset(2)" class="w-full text-left p-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 flex justify-between items-center">
+          <span>🎻 2. Klasik & Akustik Elegan</span>
+          <i class="fa-solid fa-play text-[10px] text-amber-300"></i>
+        </button>
+        <button onclick="setMusicPreset(3)" class="w-full text-left p-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 flex justify-between items-center">
+          <span>🎼 3. Orkestra Harmoni</span>
+          <i class="fa-solid fa-play text-[10px] text-amber-300"></i>
+        </button>
+      </div>
+
+      <!-- Upload Custom MP3 dari HP -->
+      <div class="pt-2 border-t border-stone-800">
+        <label class="block text-[11px] text-stone-300 font-semibold mb-1">Unggah Lagu Sendiri (MP3):</label>
+        <input type="file" id="customAudioFile" accept="audio/*" onchange="handleAudioUpload(event)" class="text-xs text-stone-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-300 file:text-stone-900 hover:file:bg-amber-400 cursor-pointer">
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+  </style>
 </body>
 </html>
